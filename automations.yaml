@@ -1,0 +1,81 @@
+alias: Notify Person when at shopping area to show shopping list
+description: >-
+  Send notify to Person when in shopping area. Ask if person wants to see the
+  shopping cart. Notify other user when other person is in shopping area
+trigger:
+  - platform: zone
+    entity_id:
+      - person.julien
+      - person.wendy
+    zone: zone.shopping
+    event: enter
+    id: paddepoel_shopping
+  - platform: zone
+    entity_id:
+      - person.julien
+      - person.wendy
+    zone: zone.shopping2
+    event: enter
+    id: lewenborg_shopping
+condition: []
+action:
+  - if:
+      - condition: zone
+        entity_id: person.julien
+        zone:
+          - zone.shopping
+          - zone.shopping2
+    then:
+      - service: notify.mobile_app_pixel_7
+        data:
+          title: Boodschappen aan het doen?
+          message: >-
+            Doe je boodschappen? Vergeet dan niet om op je boodschappenlijstje
+            te kijken!
+          data:
+            actions:
+              - action: URI
+                title: Open boodschappenlijst
+                uri: /dashboard-dashboard/shopping
+                clickAction: /dashboard-dashboard/shopping
+      - service: notify.mobile_app_pixel_7_wendy
+        data:
+          data:
+            actions:
+              - action: URI
+                title: Voeg boodschappen toe
+                uri: /dashboard-dashboard/shopping
+                clickAction: /dashboard-dashboard/shopping
+          message: Julien doet boodschappen heb jij nog iets nodig?
+          title: Er worden boodschappen gedaan
+    else:
+      - if:
+          - condition: zone
+            entity_id: person.wendy
+            zone:
+               - zone.shopping
+               - zone.shopping2
+        then:
+          - service: notify.mobile_app_pixel_7_wendy
+            data:
+              title: Boodschappen aan het doen?
+              message: >-
+                Doe je boodschappen? Vergeet dan niet om op je
+                boodschappenlijstje te kijken!
+              data:
+                actions:
+                  - action: URI
+                    title: Open boodschappenlijst
+                    uri: /dashboard-dashboard/shopping
+                    clickAction: /dashboard-dashboard/shopping
+          - service: notify.mobile_app_pixel_7
+            data:
+              data:
+                actions:
+                  - action: URI
+                    title: Voeg boodschappen toe
+                    uri: /dashboard-dashboard/shopping
+                    clickAction: /dashboard-dashboard/shopping
+              message: Wendy doet boodschappen heb jij nog iets nodig?
+              title: Er worden boodschappen gedaan
+mode: single
